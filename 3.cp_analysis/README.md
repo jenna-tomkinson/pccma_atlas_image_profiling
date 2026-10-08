@@ -16,16 +16,31 @@ In each pipeline, we:
 ## One job per cell line per plate
 
 Each cell line from each plate (time point) is processed as its own job.
-There are 174 jobs in total:
+There are 174 cell line and plate combinations in total:
 
-- 55 cell lines on three plates each (165 jobs)
-- U2-OS on all nine plates (9 jobs)
+- 55 cell lines on three plates each (165)
+- U2-OS on all nine plates (9)
+
+Of these, 166 are processed as jobs and eight are excluded (see below).
+
+### Excluded cell lines and time points
+
+Some cell lines and time points can not be processed, so no LoadData CSV is created and no job is run for them.
+
+| Cell line | Time points not processed | Plates | Number of jobs excluded |
+| --- | --- | --- | --- |
+| CF1500 | 24, 48, 72 hours (all) | BR00150698, BR00150699, BR00150700 | 3 |
+| CHLA262 | 72 hours | BR00150703 | 1 |
+| Saos-2 | 24 hours | BR00150695 | 1 |
+| X0092 | 24, 48, 72 hours (all) | BR00150698, BR00150699, BR00150700 | 3 |
+
+The exclusions are set in the `excluded_time_points` dictionary in `0.create_loaddata_csvs.ipynb`, which applies to both the HPC cluster and a local machine.
 
 ## Notebooks
 
 | Notebook | Description |
 | --- | --- |
-| `0.create_loaddata_csvs.ipynb` | Creates a LoadData CSV per plate with the paths to the images and illumination correction functions, then splits each CSV by cell line using the platemaps. |
+| `0.create_loaddata_csvs.ipynb` | Creates a LoadData CSV per plate with the paths to the images and illumination correction functions, then splits each CSV by cell line using the platemaps (excluded cell lines and time points are skipped). |
 | `1.cp_analysis_hpc.ipynb` | Runs CellProfiler for one LoadData CSV (one cell line from one plate), which is passed with `--input_csv`. |
 | `1.cp_analysis_local.ipynb` | Runs CellProfiler for all LoadData CSVs in batches on a local machine. |
 
@@ -67,7 +82,7 @@ No jobs are submitted if this step fails.
 3. Submits one child job (`cp_analysis_hpc_child.sh`) per LoadData CSV, where the job name is `<plate>_<cell_line>`.
 
 > **Note:** A job can finish without an error from SLURM even if CellProfiler failed.
-> After all jobs finish, confirm that there are 174 folders in `sqlite_outputs/` that each contain a SQLite file and check the `logs/` folder for errors.
+> After all jobs finish, confirm that there are 166 folders in `sqlite_outputs/` that each contain a SQLite file and check the `logs/` folder for errors.
 
 > **Note:** Running the parent script again will submit all jobs again, including the jobs that already finished.
 

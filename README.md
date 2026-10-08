@@ -87,7 +87,9 @@ sbatch hpc_create_envs.sh cellprofiler_env.yml
 
 ### Segmentation and feature extraction
 
-The `3.cp_analysis` module processes each cell line from each plate (time point) as its own job, which is 174 jobs in total (55 cell lines on three plates and U2-OS on nine plates).
+The `3.cp_analysis` module processes each cell line from each plate (time point) as its own job.
+There are 174 cell line and plate combinations (55 cell lines on three plates and U2-OS on nine plates), of which 166 are processed.
+The cell lines and time points that are not processed are listed in the [module README](./3.cp_analysis/README.md).
 Each job outputs a SQLite file to `3.cp_analysis/sqlite_outputs/<plate>_<cell_line>/`.
 
 To run on an HPC cluster with SLURM, submit the parent script from within the module, which creates the LoadData CSVs and submits one job per cell line per plate:
